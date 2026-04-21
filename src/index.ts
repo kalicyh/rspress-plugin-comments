@@ -7,33 +7,24 @@ import {
 
 export interface CommentPluginOptions {
   enabled?: boolean;
-  repo?: string;
-  repoId?: string;
-  category?: string;
-  categoryId?: string;
-  lang?: string;
   pageComments?: boolean;
   blockComments?: boolean;
   blockSelectorTags?: RehypeCommentableBlocksOptions['tags'];
-  termPrefix?: string;
-  inputPosition?: 'top' | 'bottom';
-}
-
-function hasRequiredConfig(options: CommentPluginOptions): boolean {
-  return Boolean(
-    options.repo && options.repoId && options.category && options.categoryId,
-  );
+  apiBase?: string;
+  pageSize?: number;
+  defaultAuthorName?: string;
 }
 
 export function pluginComments(options: CommentPluginOptions): RspressPlugin {
   const enabled = options.enabled !== false;
-  const configured = hasRequiredConfig(options);
   const runtimeOptions = {
     ...options,
     enabled,
-    configured,
     pageComments: enabled && options.pageComments !== false,
     blockComments: enabled && options.blockComments !== false,
+    apiBase: options.apiBase ?? 'http://localhost:4010',
+    pageSize: options.pageSize ?? 20,
+    defaultAuthorName: options.defaultAuthorName ?? 'Anonymous',
   };
 
   return {

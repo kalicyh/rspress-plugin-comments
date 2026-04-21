@@ -1,11 +1,20 @@
 # rspress-plugin-comments
 
-Rspress plugin for:
+Rspress plugin for self-hosted comments, with:
 
-- page-level comments rendered at the end of each document
-- block-level comments opened in a drawer from headings, paragraphs, list items, and blockquotes
+- page-level comments rendered after the document footer
+- text-selection comments inside markdown content
+- current-page comment aggregation at the bottom of the page
+- optional Gitea OAuth login for user identity, name, and avatar
 
-The plugin uses Giscus as the discussion backend and generates stable block terms from each page's content.
+This repository also contains a standalone `backend/` service used by the plugin runtime.
+
+## Current Interaction Model
+
+- Page comments are shown at the bottom of each document.
+- Block comments are selection-based: users select text, then open a nearby comment panel.
+- Existing selection comments are restored as inline highlighted ranges after page refresh.
+- Replies are rendered as a conversation-style thread with avatar, author name, and timestamp.
 
 ## Install
 
@@ -22,13 +31,9 @@ import { pluginComments } from 'rspress-plugin-comments';
 export default defineConfig({
   plugins: [
     pluginComments({
-      repo: process.env.GISCUS_REPO,
-      repoId: process.env.GISCUS_REPO_ID,
-      category: process.env.GISCUS_CATEGORY,
-      categoryId: process.env.GISCUS_CATEGORY_ID,
+      apiBase: 'http://localhost:4010',
       pageComments: true,
       blockComments: true,
-      termPrefix: 'docs',
     }),
   ],
 });
@@ -37,19 +42,27 @@ export default defineConfig({
 ## Options
 
 - `enabled`: Enable or disable the plugin. Defaults to `true`.
-- `repo`: Giscus GitHub repository in `owner/name` format.
-- `repoId`: Giscus repository id.
-- `category`: Giscus discussion category name.
-- `categoryId`: Giscus discussion category id.
-- `lang`: Giscus UI language. Defaults to `zh-CN`.
 - `pageComments`: Enable full page comments. Defaults to `true`.
-- `blockComments`: Enable block comments. Defaults to `true`.
-- `blockSelectorTags`: Override the set of commentable HTML tags.
-- `termPrefix`: Prefix added to every Giscus term.
-- `inputPosition`: `top` or `bottom`. Defaults to `bottom`.
+- `blockComments`: Enable selection comments. Defaults to `true`.
+- `blockSelectorTags`: Override the set of commentable HTML tags used for selection anchoring.
+- `apiBase`: Backend API base URL. Defaults to `http://localhost:4010`.
+- `pageSize`: Root comments per page. Defaults to `20`.
+- `defaultAuthorName`: Fallback author name when backend auth is disabled.
+
+## Backend
+
+The bundled backend is in [backend/README.md](/Users/kalicyh/Documents/GitHub/rspress-plugin-comments/backend/README.md).
+
+It currently provides:
+
+- SQLite storage
+- page and selection comment APIs
+- delete support
+- session-based login state
+- optional Gitea OAuth login
 
 ## Notes
 
-- Without Giscus configuration, the plugin renders a placeholder so the UI can still be verified locally.
-- Block terms use `pathname#blockId`.
-- Page terms use `pathname`.
+- The plugin injects stable `data-comment-id` values into supported markdown blocks.
+- Selection comments are bound to `pagePath + blockId + selected text metadata`.
+- The visual UI is optimized for Rspress documentation layouts rather than general discussion forums.

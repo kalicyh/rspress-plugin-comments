@@ -1,0 +1,15 @@
+{
+  "name": "rspress-plugin-comments-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Minimal backend for page comments and block comments used by rspress-plugin-comments.",
+  "scripts": {
+    "dev": "node scripts/start-with-env.mjs --watch",
+    "start": "node scripts/start-with-env.mjs",
+    "rebuild-native": "pnpm rebuild better-sqlite3"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.9.0"
+  }
+}

@@ -21,34 +21,6 @@ function slugify(input: string): string {
     .slice(0, 48);
 }
 
-function createButton(commentId: string): HastElement {
-  return {
-    type: 'element',
-    tagName: 'button',
-    properties: {
-      type: 'button',
-      className: ['hf-block-comment-trigger'],
-      'data-comment-trigger': '',
-      'data-comment-id': commentId,
-      'aria-label': `评论段落 ${commentId}`,
-      title: '评论这一段',
-    },
-    children: [{ type: 'text', value: '评论' }],
-  };
-}
-
-function hasTrigger(node: HastElement): boolean {
-  return (
-    node.children?.some(
-      child =>
-        child.type === 'element' &&
-        child.tagName === 'button' &&
-        child.properties &&
-        'data-comment-trigger' in child.properties,
-    ) ?? false
-  );
-}
-
 function addClassName(node: HastElement, className: string): void {
   const current = node.properties?.className;
   const next = Array.isArray(current)
@@ -65,6 +37,21 @@ function addClassName(node: HastElement, className: string): void {
     ...node.properties,
     className: next,
   };
+}
+
+function removeLegacyTrigger(node: HastElement): void {
+  if (!node.children) {
+    return;
+  }
+
+  node.children = node.children.filter(child => {
+    return !(
+      child.type === 'element' &&
+      child.tagName === 'button' &&
+      child.properties &&
+      'data-comment-trigger' in child.properties
+    );
+  });
 }
 
 function inferFilePath(file: { path?: string; history?: string[] }): string {
@@ -114,10 +101,7 @@ export function rehypeCommentableBlocks(
         'data-comment-label': rawText.slice(0, 160),
       };
       addClassName(node, 'hf-commentable-block');
-
-      if (!hasTrigger(node)) {
-        node.children = [...(node.children ?? []), createButton(commentId)];
-      }
+      removeLegacyTrigger(node);
     });
   };
 }
