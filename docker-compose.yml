@@ -5,8 +5,14 @@ services:
       - "4010:4010"
     environment:
       PORT: 4010
+      GITEA_BASE_URL: https://gitea.example.com
+      GITEA_CLIENT_ID: your-gitea-client-id
+      GITEA_CLIENT_SECRET: your-gitea-client-secret
+      GITEA_REDIRECT_URI: http://localhost:4010/auth/gitea/callback
       COMMENTS_WEB_ORIGIN: http://localhost:3000
       COMMENTS_DB_PATH: /app/data/comments.sqlite
+      GITEA_CA_CERT_PATH: /app/custom-ca.pem
     volumes:
       - ./data:/app/data
+      - ./custom-ca.pem:/app/custom-ca.pem:ro
     restart: unless-stopped
