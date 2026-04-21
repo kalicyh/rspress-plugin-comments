@@ -21,8 +21,6 @@ COPY --from=builder /app/backend-rust/target/release/rspress-plugin-comments-bac
 ENV PORT=4010
 ENV COMMENTS_DB_PATH=/app/data/comments.sqlite
 
-VOLUME ["/app/data"]
-
 EXPOSE 4010
 
 USER appuser
