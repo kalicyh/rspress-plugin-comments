@@ -38,8 +38,8 @@ GITEA_CLIENT_ID=...
 GITEA_CLIENT_SECRET=...
 GITEA_REDIRECT_URI=http://localhost:4010/auth/gitea/callback
 COMMENTS_WEB_ORIGIN=http://localhost:3000
-COMMENTS_DB_PATH=/absolute/path/to/comments.sqlite
-GITEA_CA_CERT_PATH=/absolute/path/to/custom-ca.pem
+COMMENTS_DB_PATH=./data/comments.sqlite
+GITEA_CA_CERT_PATH=./custom-ca.pem
 ```
 
 ## Storage

@@ -29,19 +29,20 @@ Startup now reads `backend/.env.local` before launching the actual Node process.
 Typical local configuration:
 
 ```env
-GITEA_BASE_URL=https://gitea.nz.com
+GITEA_BASE_URL=https://gitea.example.com
 GITEA_CLIENT_ID=...
 GITEA_CLIENT_SECRET=...
 GITEA_REDIRECT_URI=http://localhost:4010/auth/gitea/callback
 COMMENTS_WEB_ORIGIN=http://localhost:3000
-NODE_OPTIONS=--use-system-ca
-NODE_EXTRA_CA_CERTS=./custom-ca.pem
+COMMENTS_DB_PATH=./data/comments.sqlite
+GITEA_CA_CERT_PATH=./custom-ca.pem
 ```
 
 Notes:
 
 - `backend/.env.local` is intended for local-only secrets and TLS settings.
-- `NODE_EXTRA_CA_CERTS` should point to your local PEM file if your Gitea instance requires a custom CA chain.
+- `GITEA_CA_CERT_PATH` should point to your local PEM file if your Gitea instance requires a custom CA chain.
+- When `GITEA_CA_CERT_PATH` is configured, the launcher maps it to `NODE_EXTRA_CA_CERTS` and appends `--use-system-ca` to `NODE_OPTIONS` if needed.
 - If your Gitea TLS chain changes, replace your local PEM file and keep the path in `.env.local` in sync.
 
 ## Endpoints
@@ -81,4 +82,4 @@ When Gitea OAuth variables are not configured:
 ## Troubleshooting
 
 - If `better-sqlite3` reports a Node ABI mismatch, run `pnpm rebuild-native`.
-- If OAuth callback returns `fetch failed`, verify Node trusts your Gitea TLS chain and that `NODE_EXTRA_CA_CERTS` points to the correct PEM file.
+- If OAuth callback returns `fetch failed`, verify Node trusts your Gitea TLS chain and that `GITEA_CA_CERT_PATH` points to the correct PEM file.

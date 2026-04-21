@@ -31,8 +31,14 @@ if (fs.existsSync(envPath)) {
   }
 }
 
-if (!env.NODE_OPTIONS) {
-  env.NODE_OPTIONS = '--use-system-ca';
+if (env.GITEA_CA_CERT_PATH && !env.NODE_EXTRA_CA_CERTS) {
+  env.NODE_EXTRA_CA_CERTS = env.GITEA_CA_CERT_PATH;
+}
+
+if (env.GITEA_CA_CERT_PATH && !env.NODE_OPTIONS?.includes('--use-system-ca')) {
+  env.NODE_OPTIONS = env.NODE_OPTIONS
+    ? `${env.NODE_OPTIONS} --use-system-ca`
+    : '--use-system-ca';
 }
 
 const child = spawn(
