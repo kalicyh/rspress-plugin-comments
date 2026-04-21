@@ -51,7 +51,8 @@ export default defineConfig({
 
 ## Backend
 
-The bundled backend is in [backend/README.md](/Users/kalicyh/Documents/GitHub/rspress-plugin-comments/backend/README.md).
+The original Node.js backend is in [backend/README.md](/Users/kalicyh/Documents/GitHub/rspress-plugin-comments/backend/README.md).
+The Rust rewrite is in [backend-rust/README.md](/Users/kalicyh/Documents/GitHub/rspress-plugin-comments/backend-rust/README.md).
 
 It currently provides:
 

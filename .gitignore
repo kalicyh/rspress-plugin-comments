@@ -1,7 +1,9 @@
 node_modules
 dist
 .DS_Store
-/backend/data
+*/data
 .env.local
-/backend/.env.local
+*/.env.local
 *.pem
+*/target
+*.sqlite

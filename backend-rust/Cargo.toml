@@ -1,0 +1,18 @@
+[package]
+name = "rspress-plugin-comments-backend-rust"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+
+[dependencies]
+axum = { version = "0.8", features = ["macros", "json"] }
+chrono = { version = "0.4", features = ["clock", "serde"] }
+dotenvy = "0.15"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls-native-roots"] }
+rusqlite = { version = "0.32", features = ["bundled"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+tower-http = { version = "0.6", features = ["cors"] }
+url = "2"
+uuid = { version = "1", features = ["v4"] }
