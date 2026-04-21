@@ -1,6 +1,6 @@
 {
   "name": "rspress-plugin-comments",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "description": "Rspress plugin for page comments and block comment drawers powered by Giscus.",
   "homepage": "https://github.com/kalicyh/rspress-plugin-comments",
