@@ -4,12 +4,6 @@ WORKDIR /app
 
 RUN apk add --no-cache build-base
 
-COPY backend-rust/Cargo.toml backend-rust/Cargo.lock ./backend-rust/
-RUN mkdir -p backend-rust/src && \
-  printf 'fn main() {}\n' > backend-rust/src/main.rs && \
-  cargo build --manifest-path backend-rust/Cargo.toml --release && \
-  rm -rf backend-rust/src
-
 COPY backend-rust ./backend-rust
 RUN cargo build --manifest-path backend-rust/Cargo.toml --release
 
