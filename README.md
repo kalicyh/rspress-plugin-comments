@@ -1,5 +1,7 @@
 # rspress-plugin-comments
 
+[中文说明](./README.zh-CN.md)
+
 Rspress plugin for self-hosted comments, with:
 
 - page-level comments rendered after the document footer
@@ -19,7 +21,7 @@ This repository also contains a standalone `backend/` service used by the plugin
 ## Install
 
 ```bash
-pnpm add rspress-plugin-comments
+npm install rspress-plugin-comments
 ```
 
 ## Usage
