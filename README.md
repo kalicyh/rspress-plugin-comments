@@ -71,6 +71,9 @@ The repository root now includes a minimal Alpine-based container for the Rust b
 Start it locally with:
 
 ```bash
+mkdir -p ./data
+chown -R 1000:1000 ./data
+chmod 755 ./data
 docker compose pull
 docker compose up -d
 ```
@@ -80,6 +83,12 @@ Default service:
 - `http://localhost:4010`
 - database file mounted at `./data/comments.sqlite`
 - image name: `ghcr.io/kalicyh/rspress-plugin-comments:latest`
+
+Notes:
+
+- The container runs as uid/gid `1000:1000` (`appuser`).
+- If you bind-mount `./data:/app/data`, the host `./data` directory must be writable by `1000:1000`, otherwise SQLite cannot create `comments.sqlite`.
+- If you mount a custom CA file, keep it read-only, for example `./custom-ca.pem:/app/custom-ca.pem:ro`.
 
 ## Release
 

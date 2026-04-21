@@ -71,6 +71,9 @@ Rust 重写版见 [backend-rust/README.md](/Users/kalicyh/Documents/GitHub/rspre
 本地启动：
 
 ```bash
+mkdir -p ./data
+chown -R 1000:1000 ./data
+chmod 755 ./data
 docker compose pull
 docker compose up -d
 ```
@@ -80,6 +83,12 @@ docker compose up -d
 - 服务地址：`http://localhost:4010`
 - 数据库文件挂载到 `./data/comments.sqlite`
 - 镜像名：`ghcr.io/kalicyh/rspress-plugin-comments:latest`
+
+注意：
+
+- 容器内默认使用 uid/gid `1000:1000` 的 `appuser` 运行。
+- 如果使用 `./data:/app/data` 这种目录挂载，宿主机上的 `./data` 必须对 `1000:1000` 可写，否则 SQLite 无法创建 `comments.sqlite`。
+- 如果挂载自定义 CA 证书，建议使用只读挂载，例如 `./custom-ca.pem:/app/custom-ca.pem:ro`。
 
 ## 发布
 
