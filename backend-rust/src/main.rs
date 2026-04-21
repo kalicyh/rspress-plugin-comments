@@ -244,10 +244,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .layer(cors)
         .with_state(app_state);
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], config.port));
+    let addr = SocketAddr::from(([0, 0, 0, 0], config.port));
     let listener = tokio::net::TcpListener::bind(addr).await?;
     println!(
-        "[rspress-plugin-comments-backend-rust] listening on http://localhost:{}",
+        "[rspress-plugin-comments-backend-rust] listening on http://0.0.0.0:{}",
         config.port
     );
     axum::serve(listener, app).await?;

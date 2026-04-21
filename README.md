@@ -64,6 +64,32 @@ It currently provides:
 - session-based login state
 - optional Gitea OAuth login
 
+## Docker
+
+The repository root now includes a minimal Alpine-based container for the Rust backend.
+
+Start it locally with:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Default service:
+
+- `http://localhost:4010`
+- database file mounted at `./data/comments.sqlite`
+- image name: `ghcr.io/kalicyh/rspress-plugin-comments:latest`
+
+## Release
+
+Pushing a tag like `v1.0.0` triggers `.github/workflows/release.yml` to:
+
+- create a GitHub Release
+- build the Alpine image from the root `Dockerfile`
+- push `ghcr.io/kalicyh/rspress-plugin-comments:<tag>`
+- update `ghcr.io/kalicyh/rspress-plugin-comments:latest`
+
 ## Notes
 
 - The plugin injects stable `data-comment-id` values into supported markdown blocks.

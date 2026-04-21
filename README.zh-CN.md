@@ -64,6 +64,32 @@ Rust 重写版见 [backend-rust/README.md](/Users/kalicyh/Documents/GitHub/rspre
 - 基于 session 的登录态
 - 可选的 Gitea OAuth 登录
 
+## Docker
+
+仓库根目录现在提供了一个基于 Alpine 的最小 Rust 后端镜像。
+
+本地启动：
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+默认行为：
+
+- 服务地址：`http://localhost:4010`
+- 数据库文件挂载到 `./data/comments.sqlite`
+- 镜像名：`ghcr.io/kalicyh/rspress-plugin-comments:latest`
+
+## 发布
+
+推送形如 `v1.0.0` 的 tag 后，会触发 `.github/workflows/release.yml`，自动：
+
+- 创建 GitHub Release
+- 用根目录 `Dockerfile` 构建 Alpine 镜像
+- 推送 `ghcr.io/kalicyh/rspress-plugin-comments:<tag>`
+- 更新 `ghcr.io/kalicyh/rspress-plugin-comments:latest`
+
 ## 说明
 
 - 插件会为支持的 Markdown 块注入稳定的 `data-comment-id`

@@ -1,0 +1,12 @@
+services:
+  rspress-plugin-comments:
+    image: ghcr.io/kalicyh/rspress-plugin-comments:latest
+    ports:
+      - "4010:4010"
+    environment:
+      PORT: 4010
+      COMMENTS_WEB_ORIGIN: http://localhost:3000
+      COMMENTS_DB_PATH: /app/data/comments.sqlite
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
