@@ -6,10 +6,12 @@ import { MessageSquareQuote, X } from 'lucide-react';
 import { fetchCommentCounts } from './api';
 import CommentsPanel from './CommentsPanel';
 import type {
+  RuntimeAuthState,
   RuntimeCommentOptions,
   SelectionMeta,
   SelectionSegment,
 } from './types';
+import { WithLogto } from './LogtoRuntime';
 
 interface SelectionComment {
   blockId: string;
@@ -273,6 +275,20 @@ function getSelectionComment(): SelectionComment | null {
 }
 
 export default function BlockComments(options: RuntimeCommentOptions) {
+  return (
+    <WithLogto handleCallback={!options.pageComments} options={options}>
+      {auth => <BlockCommentsInternal auth={auth} options={options} />}
+    </WithLogto>
+  );
+}
+
+function BlockCommentsInternal({
+  auth,
+  options,
+}: {
+  auth?: RuntimeAuthState;
+  options: RuntimeCommentOptions;
+}) {
   const location = useLocation();
   const pathname = (location as { pathname?: string })?.pathname || '/';
   const [selectionDraft, setSelectionDraft] = useState<SelectionComment | null>(null);
@@ -503,6 +519,7 @@ export default function BlockComments(options: RuntimeCommentOptions) {
               title={selectionActive.text}
             >
               <CommentsPanel
+                auth={auth}
                 emptyText="这段选中文本还没有评论。"
                 options={options}
                 onCommentCreated={comment => {

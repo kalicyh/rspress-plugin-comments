@@ -29,9 +29,18 @@ export interface CommentRecord {
 
 export interface AuthUser {
   id: string;
-  login: string;
+  login: string | null;
   name: string;
   avatarUrl: string | null;
+}
+
+export interface RuntimeAuthState {
+  authEnabled: boolean;
+  authLabel: string;
+  currentUser: AuthUser | null;
+  isLoading: boolean;
+  login: () => void;
+  logout: () => void;
 }
 
 export interface CommentsResponse {

@@ -138,6 +138,7 @@ export async function createComment(
     pagePath: string;
     blockId?: string;
     parentId?: string;
+    user?: AuthUser | null;
     authorName?: string;
     quoteText?: string;
     selectionMeta?: SelectionMeta;
@@ -152,7 +153,11 @@ export async function createComment(
     },
     body: JSON.stringify({
       ...payload,
-      authorName: payload.authorName || options.defaultAuthorName,
+      authorId: payload.user?.id,
+      authorLogin: payload.user?.login,
+      authorAvatarUrl: payload.user?.avatarUrl,
+      authorName: payload.user?.name ?? payload.authorName ?? options.defaultAuthorName,
+      user: undefined,
     }),
   });
 

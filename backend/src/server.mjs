@@ -385,8 +385,8 @@ const server = createServer(async (req, res) => {
         ...input,
         authorId: user?.id ?? input.authorId,
         authorName: user?.name ?? input.authorName,
-        authorLogin: user?.login ?? null,
-        authorAvatarUrl: user?.avatarUrl ?? null,
+        authorLogin: user?.login ?? input.authorLogin ?? null,
+        authorAvatarUrl: user?.avatarUrl ?? input.authorAvatarUrl ?? null,
       });
       return json(req, res, 201, { item: comment });
     } catch (error) {

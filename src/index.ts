@@ -13,6 +13,12 @@ export interface CommentPluginOptions {
   apiBase?: string;
   pageSize?: number;
   defaultAuthorName?: string;
+  logto?: {
+    endpoint: string;
+    appId: string;
+    callbackPath?: string;
+    postSignOutRedirectUri?: string;
+  };
 }
 
 export function pluginComments(options: CommentPluginOptions): RspressPlugin {

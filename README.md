@@ -8,6 +8,7 @@ Rspress plugin for self-hosted comments, with:
 - text-selection comments inside markdown content
 - current-page comment aggregation at the bottom of the page
 - optional Gitea OAuth login for user identity, name, and avatar
+- optional Logto login through `@logto/react`
 
 This repository also contains a standalone `backend/` service used by the plugin runtime.
 
@@ -36,6 +37,10 @@ export default defineConfig({
       apiBase: 'http://localhost:4010',
       pageComments: true,
       blockComments: true,
+      logto: {
+        endpoint: 'https://your-logto-endpoint.example.com/',
+        appId: 'your-logto-app-id',
+      },
     }),
   ],
 });
@@ -50,6 +55,16 @@ export default defineConfig({
 - `apiBase`: Backend API base URL. Defaults to `http://localhost:4010`.
 - `pageSize`: Root comments per page. Defaults to `20`.
 - `defaultAuthorName`: Fallback author name when backend auth is disabled.
+- `logto`: Optional Logto frontend login config.
+- `logto.endpoint`: Logto endpoint.
+- `logto.appId`: Logto application ID.
+- `logto.callbackPath`: Sign-in callback path. Defaults to `/callback`.
+- `logto.postSignOutRedirectUri`: Post sign-out redirect URI. Defaults to the current site origin.
+
+When Logto is enabled, configure these URIs in the Logto Console for local development:
+
+- Redirect URI: `http://localhost:3000/callback`
+- Post sign-out redirect URI: `http://localhost:3000/`
 
 ## Backend
 

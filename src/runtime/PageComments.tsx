@@ -2,8 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation } from '@rspress/core/runtime';
 import { fetchCommentCounts } from './api';
-import type { RuntimeCommentOptions } from './types';
+import type { RuntimeAuthState, RuntimeCommentOptions } from './types';
 import CommentsPanel from './CommentsPanel';
+import { WithLogto } from './LogtoRuntime';
 
 const FOOTER_SELECTOR = '.rp-doc-footer';
 const DOC_SELECTOR = '.rp-doc';
@@ -16,13 +17,26 @@ export default function PageComments(options: RuntimeCommentOptions) {
     return null;
   }
 
-  return <PageCommentsInternal key={pathname} options={options} pathname={pathname} />;
+  return (
+    <WithLogto options={options}>
+      {auth => (
+        <PageCommentsInternal
+          auth={auth}
+          key={pathname}
+          options={options}
+          pathname={pathname}
+        />
+      )}
+    </WithLogto>
+  );
 }
 
 function PageCommentsInternal({
+  auth,
   options,
   pathname,
 }: {
+  auth?: RuntimeAuthState;
   options: RuntimeCommentOptions;
   pathname: string;
 }) {
@@ -91,16 +105,18 @@ function PageCommentsInternal({
   }
 
   return createPortal(
-    <PageCommentsContent options={options} pathname={pathname} target={target} />,
+    <PageCommentsContent auth={auth} options={options} pathname={pathname} target={target} />,
     container,
   );
 }
 
 function PageCommentsContent({
+  auth,
   options,
   pathname,
   target,
 }: {
+  auth?: RuntimeAuthState;
   options: RuntimeCommentOptions;
   pathname: string;
   target: { pagePath: string };
@@ -213,6 +229,7 @@ function PageCommentsContent({
                       {thread.text}
                     </blockquote>
                     <CommentsPanel
+                      auth={auth}
                       emptyText="这段选中文本还没有评论。"
                       options={options}
                       showQuote={false}
@@ -230,6 +247,7 @@ function PageCommentsContent({
         {activeTab === 'page' ? (
           <div className="hf-page-comment-tabpanel" role="tabpanel">
             <CommentsPanel
+              auth={auth}
               emptyText="当前页面还没有评论。"
               options={options}
               showTitle={false}

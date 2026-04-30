@@ -36,6 +36,10 @@ export default defineConfig({
       apiBase: 'http://localhost:4010',
       pageComments: true,
       blockComments: true,
+      logto: {
+        endpoint: 'https://your-logto-endpoint.example.com/',
+        appId: 'your-logto-app-id',
+      },
     }),
   ],
 });
@@ -50,6 +54,16 @@ export default defineConfig({
 - `apiBase`：后端 API 地址，默认 `http://localhost:4010`
 - `pageSize`：每页根评论数量，默认 `20`
 - `defaultAuthorName`：后端未开启认证时的默认作者名
+- `logto`：可选的 Logto 前端登录配置
+  - `endpoint`：Logto endpoint
+  - `appId`：Logto 应用 ID
+  - `callbackPath`：登录回调路径，默认 `/callback`
+  - `postSignOutRedirectUri`：退出登录后重定向 URI，默认当前站点根地址
+
+使用 Logto 时，请在 Logto 控制台配置：
+
+- 重定向 URI：`http://localhost:3000/callback`
+- 退出登录后重定向 URI：`http://localhost:3000/`
 
 ## 后端
 

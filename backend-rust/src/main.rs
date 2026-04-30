@@ -190,6 +190,10 @@ struct CreateCommentInput {
     author_name: Option<String>,
     #[serde(rename = "authorId")]
     author_id: Option<String>,
+    #[serde(rename = "authorLogin")]
+    author_login: Option<String>,
+    #[serde(rename = "authorAvatarUrl")]
+    author_avatar_url: Option<String>,
     body: Option<String>,
     #[serde(rename = "quoteText")]
     quote_text: Option<String>,
@@ -815,8 +819,14 @@ async fn post_comment(
             .map(|current| current.name.clone())
             .or(input.author_name)
             .unwrap_or_else(|| "Anonymous".to_string()),
-        author_login: user.as_ref().and_then(|current| current.login.clone()),
-        author_avatar_url: user.as_ref().and_then(|current| current.avatar_url.clone()),
+        author_login: user
+            .as_ref()
+            .and_then(|current| current.login.clone())
+            .or(input.author_login),
+        author_avatar_url: user
+            .as_ref()
+            .and_then(|current| current.avatar_url.clone())
+            .or(input.author_avatar_url),
         body: input.body.unwrap(),
     };
 

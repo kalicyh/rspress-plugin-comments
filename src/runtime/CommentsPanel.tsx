@@ -16,6 +16,7 @@ import type {
   CommentRecord,
   CommentNode,
   CommentTarget,
+  RuntimeAuthState,
   RuntimeCommentOptions,
   SelectionMeta,
 } from './types';
@@ -29,6 +30,7 @@ interface CommentsPanelProps {
   showQuote?: boolean;
   onCountChange?: (count: number) => void;
   onCommentCreated?: (comment: CommentRecord) => void;
+  auth?: RuntimeAuthState;
   quoteText?: string;
   selectionMeta?: SelectionMeta;
 }
@@ -44,6 +46,7 @@ export default function CommentsPanel({
   showQuote = true,
   onCountChange,
   onCommentCreated,
+  auth,
   quoteText,
   selectionMeta,
 }: CommentsPanelProps) {
@@ -59,12 +62,21 @@ export default function CommentsPanel({
   const accountMenuRef = useRef<HTMLDivElement | null>(null);
   const accountTriggerRef = useRef<HTMLButtonElement | null>(null);
   const composerInputRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
+  const effectiveAuthEnabled = auth?.authEnabled ?? authEnabled;
+  const effectiveCurrentUser = auth?.currentUser ?? currentUser;
+  const effectiveAuthLabel = auth?.authLabel ?? 'Gitea';
 
   useEffect(() => {
     onCountChangeRef.current = onCountChange;
   }, [onCountChange]);
 
   useEffect(() => {
+    if (auth) {
+      setAuthEnabled(auth.authEnabled);
+      setCurrentUser(auth.currentUser);
+      return;
+    }
+
     let cancelled = false;
 
     const run = async () => {
@@ -100,7 +112,7 @@ export default function CommentsPanel({
         window.removeEventListener(AUTH_STATE_EVENT, onAuthChange);
       }
     };
-  }, [options, refreshKey]);
+  }, [auth, options, refreshKey]);
 
   useEffect(() => {
     if (!accountMenuOpen) {
@@ -171,6 +183,7 @@ export default function CommentsPanel({
           quoteText,
           selectionMeta,
           body,
+          user: effectiveCurrentUser,
         });
         onCommentCreated?.(comment);
         setRefreshKey(key => key + 1);
@@ -180,7 +193,15 @@ export default function CommentsPanel({
         setRefreshKey(key => key + 1);
       },
     }),
-    [onCommentCreated, options, quoteText, selectionMeta, target.pagePath, target.blockId],
+    [
+      effectiveCurrentUser,
+      onCommentCreated,
+      options,
+      quoteText,
+      selectionMeta,
+      target.pagePath,
+      target.blockId,
+    ],
   );
 
   return (
@@ -213,7 +234,7 @@ export default function CommentsPanel({
         <div className="hf-comment-list">
           {items.map(item => (
             <CommentThread
-              currentUser={currentUser}
+              currentUser={effectiveCurrentUser}
               key={item.id}
               root={item}
               onDelete={actions.remove}
@@ -226,38 +247,53 @@ export default function CommentsPanel({
         </div>
       </div>
 
-      {authEnabled && !currentUser ? (
+      {effectiveAuthEnabled && !effectiveCurrentUser && !auth?.isLoading ? (
         <div className="hf-comment-auth-loginbar">
-          <span className="hf-comments-meta">使用 Gitea 登录后即可发表评论。</span>
-          <a
-            className="hf-comment-inline-button hf-comment-auth-link"
-            href={buildLoginUrl(
-              options,
-              typeof window !== 'undefined'
-                ? `${window.location.pathname}${window.location.search}${window.location.hash}`
-                : target.pagePath,
-            )}
-          >
-            使用 Gitea 登录
-          </a>
+          <span className="hf-comments-meta">使用 {effectiveAuthLabel} 登录后即可发表评论。</span>
+          {auth ? (
+            <button
+              className="hf-comment-inline-button hf-comment-auth-link"
+              onClick={auth.login}
+              type="button"
+            >
+              使用 {effectiveAuthLabel} 登录
+            </button>
+          ) : (
+            <a
+              className="hf-comment-inline-button hf-comment-auth-link"
+              href={buildLoginUrl(
+                options,
+                typeof window !== 'undefined'
+                  ? `${window.location.pathname}${window.location.search}${window.location.hash}`
+                  : target.pagePath,
+              )}
+            >
+              使用 {effectiveAuthLabel} 登录
+            </a>
+          )}
         </div>
       ) : null}
 
-      {!authEnabled || currentUser ? (
+      {!effectiveAuthEnabled || effectiveCurrentUser ? (
         <CommentComposer
           accountMenuOpen={accountMenuOpen}
-          authEnabled={authEnabled}
-          currentUser={currentUser}
+          authEnabled={effectiveAuthEnabled}
+          authLabel={effectiveAuthLabel}
+          currentUser={effectiveCurrentUser}
           onLogout={() => {
-            void logout(options)
-              .then(() => {
-                setAccountMenuOpen(false);
-                setCurrentUser(null);
-                setRefreshKey(key => key + 1);
-                if (typeof window !== 'undefined') {
-                  window.dispatchEvent(new Event(AUTH_STATE_EVENT));
-                }
-              });
+            if (auth) {
+              auth.logout();
+              return;
+            }
+
+            void logout(options).then(() => {
+              setAccountMenuOpen(false);
+              setCurrentUser(null);
+              setRefreshKey(key => key + 1);
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new Event(AUTH_STATE_EVENT));
+              }
+            });
           }}
           accountTriggerRef={accountTriggerRef}
           onToggleAccountMenu={() => setAccountMenuOpen(value => !value)}
@@ -445,7 +481,7 @@ function getInitials(name: string) {
 }
 
 function Avatar({ user }: { user: AuthUser }) {
-  const initials = getInitials(user.name || user.login);
+  const initials = getInitials(user.name || user.login || user.id);
 
   if (user.avatarUrl) {
     return (
@@ -470,6 +506,7 @@ function CommentComposer({
   accountMenuRef,
   accountTriggerRef,
   authEnabled,
+  authLabel,
   currentUser,
   inputRef,
   label,
@@ -484,6 +521,7 @@ function CommentComposer({
   accountMenuRef?: RefObject<HTMLDivElement | null>;
   accountTriggerRef?: RefObject<HTMLButtonElement | null>;
   authEnabled: boolean;
+  authLabel: string;
   currentUser: AuthUser | null;
   inputRef?: RefObject<HTMLInputElement | HTMLTextAreaElement | null>;
   label: string;
@@ -510,7 +548,7 @@ function CommentComposer({
         }
 
         if (authEnabled && !currentUser) {
-          setError('请先登录 Gitea 再发表评论');
+          setError(`请先登录 ${authLabel} 再发表评论`);
           return;
         }
 
